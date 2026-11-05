@@ -6,6 +6,7 @@ use App\Http\Requests\ListLeadsRequest;
 use App\Http\Requests\StoreLeadRequest;
 use App\Http\Requests\UpdateLeadRequest;
 use App\Http\Resources\LeadResource;
+use App\Jobs\NotifyRepOfAssignment;
 use App\Models\Lead;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -28,6 +29,10 @@ class LeadController extends Controller
     public function store(StoreLeadRequest $request): LeadResource
     {
         $lead = Lead::create($request->leadAttributes());
+
+        if ($lead->assigned_to !== null && $lead->assigned_to !== $request->user()->id) {
+            NotifyRepOfAssignment::dispatch($lead);
+        }
 
         return LeadResource::make($lead->load('assignedRep'));
     }

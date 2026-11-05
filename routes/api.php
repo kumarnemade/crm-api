@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LeadAssignmentController;
 use App\Http\Controllers\LeadController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,4 +12,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('leads', [LeadController::class, 'store']);
     Route::get('leads/{lead}', [LeadController::class, 'show'])->can('view', 'lead');
     Route::patch('leads/{lead}', [LeadController::class, 'update'])->can('update', 'lead');
+    Route::post('leads/{lead}/assign', LeadAssignmentController::class)->can('assign', 'lead');
 });
