@@ -46,6 +46,21 @@ class AuthTest extends TestCase
             ->assertJsonPath('errors.email.0', __('auth.failed'));
     }
 
+    public function test_protected_routes_reject_requests_without_a_token(): void
+    {
+        $this->getJson('/api/leads')
+            ->assertUnauthorized()
+            ->assertExactJson(['message' => 'Unauthenticated.']);
+    }
+
+    public function test_an_issued_token_authenticates_api_requests(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->withToken($token)->getJson('/api/leads')->assertOk();
+    }
+
     public function test_login_requires_email_and_password(): void
     {
         $this->postJson('/api/login')
